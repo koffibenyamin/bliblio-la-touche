@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+        <div class="work">
+
+            <!--Modal add a book-->
+            <fieldset style="width: 30%; height: fit-content;">
+                <legend>Enregister un livre</legend>
+                <button onclick="openisbnModal()">Ajouter par ISBN</button>
+                <button onclick="openModal()">Ajouter par Détails</button>
+            </fieldset>
+
+            <!-- confimation message  -->
+
+            <div id="successMessage" th:if="${param.success}"
+                style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                Livre ajouté avec succès !
+            </div>
+
+            <!-- Display flash messages -->
+            <div th:if="${message}" style="color: green;">
+                <p th:text="${message}"></p>
+            </div>
+            <div th:if="${error}" style="color: red;">
+                <p th:text="${error}"></p>
+            </div>
+
+
+
+
+
+
+
+            <div class="modal" id="isbn_modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeisbnModal()">&times;</span>
+                    <form method="get" th:action="@{/book/isbn}">
+                        <label>Numbre de Copies</label><br>
+                        <input type="number" name="numberOfCopies" min="1" required><br>
+                        <label>ISBN</label><br>
+                        <input type="text" name="isbn" required><br>
+
+                        <button type="submit">Enrégistrer</button>
+                    </form>
+                </div>
+        </div>
+
+
+
+        <div class="modal" id="add_modal">
+            <div class="modal-content" id="confi" style="display: inline-block;">
+                <span class="close" onclick="closeModal()">&times;</span>
+
+                <form id="add_modal" action="book/add" enctype="multipart/form-data" method="post">
+                    <p>Enrégistrer un Livre</p>
+                    <div>
+                        <h1>Couverture</h1>
+                        <p><input type='file' name="thumbnail" accept='image/*' onchange="readURL(this)"></p>
+                        <img src="" alt="No Image" id="img" style='height:150px;'>
+                    </div>
+                    <div>
+                        <label for="user_name">Titre</label><br>
+                        <input type="text" name="title" id=""><br>
+                        <label for="">Nombre de copies</label><br>
+                        <input type="number" name="numberOfCopies" min="1" id=""><br>
+                        <label for="genre">Genre</label><br>
+                        <input type="text" name="genre.name" list="genreList" placeholder="Entrer ou choisir un genre">
+                        <datalist id="genreList">
+                            <option th:each="g : ${genres}" th:value="${g.name}"></option>
+                        </datalist><br>
+
+                        <label for="author">Auteur</label><br>
+                        <input type="text" name="author.name" list="authorList"
+                            placeholder="Entrer ou choisir un auteur">
+                        <datalist id="authorList">
+                            <option th:each="a : ${authors}" th:value="${a.name}"></option>
+                        </datalist>
+                    </div>
+
+                    <div>
+                        <label for="">Résumé</label><br>
+                        <textarea name="description" id=""></textarea>
+                    </div>
+
+
+                    <button type="submit">Ajouter</button>
+
+                </form>
+            </div>
+        </div>
+
+
+
+        <!--Modal update a member-->
+        <div class="modal" id="book_modal">
+            <div class="modal-content" id="confi" style="display: inline-block;">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <form id="bookForm" method="post" enctype="multipart/form-data">
+                    <h6></h6>
+                    <div>
+                        <h1>Couverture</h1>
+                        <p><input type='file' name="thumbnail" accept='image/*' onchange="readURL(this)"></p>
+                        <img src="" alt="No Image" id="img" style='height:150px;'>
+                    </div>
+                    <div>
+                        <label for="title">Titre</label><br>
+                        <input type="text" name="title" id=""><br>
+                        <label for="author">Auteur</label><br>
+                        <input type="text" name="author.name" list="authorList"
+                            placeholder="Entrer ou choisir un auteur">
+                        <datalist id="authorList">
+                            <option th:each="a : ${authors}" th:value="${a.name}"></option>
+                        </datalist>
+                        <label for="genre">Genre</label><br>
+                        <input type="text" name="genre.name" list="genreList" placeholder="Entrer ou choisir un genre">
+                        <datalist id="genreList">
+                            <option th:each="g : ${genres}" th:value="${g.name}"></option>
+                        </datalist><br>
+
+                        <label for="quantity">Nombre de copies</label><br>
+                        <input type="number" name="numberOfCopies" id=""><br>
+
+                    </div>
+                    <div>
+                        <label for="description">Résumé</label><br>
+                        <textarea name="description" id=""></textarea><br>
+
+
+                    </div>
+                    <button type="submit">Valider</button>
+
+                </form>
+            </div>
+        </div>
+
+
+
+
+
+        <div id="list-th">
+
+            <div class="book read">
+                <div class="cover">
+
+                    <img src="image/f98e2d661445620266c0855d418aab71.jpg">
+
+                </div>
+                <div class="description">
+                    <p class="title">Frankenstein<br>
+                        <span class="author">Mary Shelley</span>
+                    </p>
+                </div>
+            </div>
+            <div class="book read">
+                <div class="cover">
+
+                    <img src="image/little-princess-book-cover.jpg">
+
+                </div>
+                <div class="description">
+                    <p class="title">A Little Princess<br>
+                        <span class="author">Frances Hodgson Burnett</span>
+                    </p>
+                </div>
+            </div>
+            <div class="book unread">
+                <div class="cover">
+
+                    <img src="image/28129-1.jpeg">
+
+                </div>
+                <div class="description">
+                    <p class="title">Roughing It</br>
+                        <span class="author">Mark Twain</span>
+                    </p>
+                </div>
+            </div>
+            <div class="book unread">
+                <div class="cover">
+
+                    <img src="image/Bird-by-Bird-image1.jpg">
+
+                </div>
+                <div class="description">
+                    <p class="title">Bird By Bird</br>
+                        <span class="author">Anne Lamott</span>
+                    </p>
+                </div>
+            </div>
+            <div class="book read">
+                <div class="cover">
+
+                    <img src="image/23209971.jpg">
+
+                </div>
+                <div class="description">
+                    <p class="title">Girl at War</br>
+                        <span class="author">Sara Novic</span>
+                    </p>
+                </div>
+            </div>
+            <div class="book read">
+                <div class="cover">
+
+                    <img src="image/9780062315007_p0_v2_s192x300.jpg">
+
+                </div>
+                <div class="description">
+                    <p class="title">The Alchemist</br>
+                        <span class="author">Paulo Coelho</span>
+                    </p>
+                </div>
+            </div>
+            <div class="book read">
+                <div class="cover">
+
+                    <img src="image/Anne_of_Green_Gables.jpeg">
+
+                </div>
+                <div class="description">
+                    <p class="title">Anne of Green Gables</br>
+                        <span class="author">Lucy Maud Montgomery</span>
+                    </p>
+                </div>
+
+
+            </div>
+            <div>
+                <input type="text" name="recherche" id="myInput" placeholder="Rechercher un Livre, Auteur...">
+                <button id="delleteAll">supprimer la selection</button>
+
+                <table id="myTable">
+                    <tr class="header">
+                        <th> </th>
+                        <th>Code</th>
+                        <th style="width:30%;">Titre</th>
+                        <th>Auteur</th>
+                        <th>Genre</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    <tr th:each="book : ${bk}">
+                        <td class="center">
+                            <input type="checkbox" class="checkbox" id="check1" />
+                        </td>
+                        <td th:text="${book['serialNumber']}">4123</td>
+                        <td><a href="book_detail.html" th:text="${book['title']}"></a></td>
+                        <td th:text="${book['author']}"></td>
+                        <td th:text="${book['genre']}"></td>
+                        <td><!--
+                            <span th:if="${book['available']}" style="color: green;">disponible</span>
+                    <span th:if="${!book['available']}" style="color: red;">Indisponible</span>-->
+                        </td>
+
+                        <td>
+
+
+                            <button class="img_btn" onclick="openUpdateModal()"><img src="/image/icon/edit.png"
+                                    alt=""></button>
+
+
+
+                            <a class="img_btn" th:href="@{/book/delete/{id}(id=${book['id']})}"
+                                onclick="return confirm('Voulez Vous supprimé ce livre?')"><img
+                                    src="/image/icon/delete.png" alt="">
+
+                            </a>
+                        </td>
+                    </tr>
+
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="pagination">
+        <a href="#">&laquo;</a>
+        <a href="#" class="active">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+        <a href="#">5</a>
+        <a href="#">6</a>
+        <a href="#">&raquo;</a>
+    </div>
+
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

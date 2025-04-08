@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/style.css">
+    <title>La Touche Biblio</title>
+</head>
+
+<body>
+
+    <div class="sidenav" th:fragment="side">
+        <a href="book.html" class="logo">
+            <img src="/image/logo.png" alt="">
+            <p class="text">La Touche<br><i><small>Touch and Impact</small></i></p>
+
+        </a>
+        <br>
+        <a href="book.html" style="border-left: 5px solid">Bibliothèque</a>
+        <a href="user.html">Utilisateur</a>
+        <a href="member.html">Membre</a>
+        <a href="stat.html">Statistique</a>
+    </div>
+
+    <div class="main" >
+        <header th:fragment="header">
+            <div class="left">
+                <p>Bibliothèque</p>
+            </div>
+            <div class="user-menu">
+                <div class="logo">
+                    <img src="image/icon/user.png" alt="User Account" />
+                    <p class="text_user">Koassi Chirst <br><i>Administrateur</i></p>
+                </div>
+
+                <div class="submenu">
+                    <a href="parameter.html">Paramètre</a>
+                    <a href="login.html">Déconnection</a>
+                </div>
+            </div>
+        </header>
+        
+        </div>
+        </body>
+        </html>

@@ -1,0 +1,414 @@
+:root {
+    --primary: #213555;
+    --on-primary: #FFFFFF;
+    --primary-container: #B9CAE6;
+    --on-primary-container: #142033;
+    --secondary: #3E5879;
+    --on-secondary: #FFFFFF;
+    --secondary-container: #C2D2E6;
+    --on-secondary-container: #1A2533;
+    --tertiary: #D8C4B6;
+    --on-tertiary: #FFFFFF;
+    --tertiary-container: #E6DFDA;
+    --on-tertiary-container: #332E2B;
+    --error: #B3261E;
+    --on-error: #FFFFFF;
+    --error-container: #E6ACA9;
+    --on-error-container: #330B09;
+    --background: #fcfcfc;
+    --on-background: #313233;
+    --surface: #fcfcfc;
+    --on-surface: #313233;
+    --surface-variant: #dde0e6;
+    --on-surface-variant: #5a5e66;
+    --outline: #868d99;
+
+}
+
+#myInput {
+    width: 50%; /* Full-width */
+    font-size: 16px; /* Increase font-size */
+    padding: 12px 20px 12px 40px; /* Add some padding */
+    border: 1px solid #ddd; /* Add a grey border */
+    margin-bottom: 12px; /* Add some space below the input */
+  }
+  
+  #myTable {
+    border-collapse: collapse; /* Collapse borders */
+    width: 100%; /* Full-width */
+    border: 1px solid #ddd; /* Add a grey border */
+    font-size: 18px; /* Increase font-size */
+  }
+  
+  #myTable th, #myTable td {
+    text-align: left; /* Left-align text */
+    padding: 12px; /* Add padding */
+    
+  }
+  
+  #myTable tr {
+    /* Add a bottom border to all table rows */
+    border-bottom: 1px solid #ddd;
+    color: var(--on-surface-variant);
+  }
+  
+  #myTable tr.header{
+    /* Add a grey background color to the table header and on hover */
+    background-color: var(--primary-container);
+    color: var(--on-primary);
+  }
+
+  #myTable a{
+    color: var(--on-surface-variant);
+  }
+
+
+/**/
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+}
+
+#confi{
+  width: 900px;
+}
+
+.close {
+    
+    border: none;
+    padding: 0%;
+    background-color: var(--on-error);
+    color: var(--error);
+    float: right;
+}
+
+/*  */
+.book {
+  display: inline-block;
+  width: 115px;
+  height: 195px;
+  box-shadow: 0 0 20px #aaa;
+  margin: 10px;
+  padding: 10px 10px 0 10px;
+  vertical-align: top;
+  transition: height 1s;
+}
+
+
+
+.cover {
+  border: 2px solid gray;
+  height: 70%;
+  overflow: hidden;
+}
+
+.cover img {
+  width: 100%;
+}
+
+.book p {
+  margin-top: 12px;
+  font-size: 10px;
+}
+
+.book .author {
+  font-size: 10px;
+}
+
+  
+
+/**/
+
+
+body {
+    font-family: "Lato", sans-serif;
+  }
+
+
+  .work *:not(.modal, .pagination){
+    margin:1%;
+
+  }
+
+  .logo {
+    display: flex;
+    text-decoration: none;
+    margin-left: 5px;
+  }
+
+  .text {
+    margin-left: 5px; 
+    margin-top: 20px;
+    color: var(--on-primary-container);
+  }
+
+  .text_user {
+    margin-left: 5px; 
+    margin-top: 11px;
+    color: #818181;
+  }
+
+  
+  .sidenav {
+    height: 100%;
+    width: 190px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: var(--primary-container);
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+  
+  .sidenav a:not(.logo) {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: var(--on-primary-container);
+    display: block;
+  }
+  
+  .sidenav a:hover {
+    color: var(--secondary);
+  }
+  
+ 
+  .main {
+    margin-left: 190px; /* Same as the width of the sidenav */
+    padding: 0px 10px;
+  }
+
+  
+  .logo img {
+    width:60px;height:60px;margin-top:10px;
+    border-radius: 50%;
+  }
+  
+  
+
+  header {
+    display: inline-block;
+    width: 100%;
+    border-bottom: 1px solid var(--primary);
+    
+}
+.left{
+  font-size: larger;
+  font: bold;
+  color: var(--primary);
+  float: left;
+}
+
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+    float: right;
+}
+
+.user-menu img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.submenu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 100;
+}
+.submenu a {
+  display: block;
+  
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.3s ease;
+}
+.submenu a:hover {
+  background-color: #f0f0f0;
+}
+.user-menu:hover .submenu {
+  display: block;
+}
+
+.img_btn{
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.img_btn img {
+  border-radius: 3px;
+  background-color: var(--primary);
+  display: block;
+  width: 22px;
+  
+}
+
+
+
+.element_quantity{
+  display: inline-block;
+  height: 75px;
+  width: 27%;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  border-radius: 3px;
+  margin: 1%;
+  padding: 1%;
+  position: relative;
+
+}
+
+.element_quantity p,
+.element_quantity select{
+  display: inline;
+    vertical-align: top;
+}
+
+.book_number{
+ position: absolute;
+ font-size: x-large;
+ bottom: 0;
+}
+
+.modal-content div{
+  display: inline-block;
+ 
+}
+
+button{
+  background-color: var(--secondary);
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  border-radius: 3px;
+}
+
+#delleteAll{
+float:right;
+}
+
+textarea select input{
+  color: var(--on-surface-variant);
+  border:1px solid var(--surface-variant);
+  display: inline-block;
+  border-radius: 3px;
+  padding: 7px 32px;
+}
+textarea{
+  width: 850px; 
+  height: 100px;
+  resize: none;
+}
+
+.available{
+  border: 2px solid var(--primary-container); 
+  color: var(--primary-container); 
+  text-align: center; 
+  border-radius: 4px;
+}
+
+.overdue{
+  border: 2px solid #e6c087; 
+  color: #e6c087; 
+  text-align: center; 
+  border-radius: 4px;
+}
+
+.unavailable{
+  border: 2px solid var(--error-container); 
+  color: var(--error-container); 
+  text-align: center; 
+  border-radius: 4px;
+}
+
+
+
+
+#cancelDelete{
+  background-color: var(--error);
+}
+
+
+
+/*Pagination*/
+.pagination {
+  display: inline-block;
+  float: right;
+  margin-bottom: 1%;
+  margin-right: 1%;
+  
+
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+}
+
+.pagination a.active {
+  background-color: var(--secondary);
+  color: white;
+  border: 1px solid var(--secondary);
+}
+
+
+
+.column {
+  float: left;
+  width: 15%;
+  height: 300px;
+  padding: 0 10px;
+  justify-items: center;
+  border-color: black;
+  box-shadow: 0 0 20px var(--tertiary);
+}
+
+
+
+.column img{
+  padding-top: 3px;
+  height: 75%;
+}
+
+
+
+.borrowed{
+  display: inline-block;
+  vertical-align: top; 
+}
+
+.book_list{
+  font-size: small;
+  }
+
+.book_list ul{
+  left: 0;
+}
