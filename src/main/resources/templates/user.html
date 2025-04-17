@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+
+            <!--Modal add a member-->
+            <button onclick="openCreateModal()">Créer Un Utilisateur</button>
+            <div class="modal" id="add_modal">
+                <div class="modal-content">
+                    <button class="close" onclick="closeCreateModal()">x</button>
+                    <br>
+                    <form th:action="@{/user/save}" method="post" th:object="${newUser}">
+                        <label for="user_name">Nom:</label><br>
+                        <input  type="text" name="namePerson"><br>
+                        <label for="user_fname">Prénom:</label><br>
+                        <input type="text" name="firstNamePerson"><br>
+                        <label for="role">Role</label><br>
+                        <select name="role" id="">
+                            <option value="bibliothecaire">bibliothecaire</option>
+                            <option value="Administrateur">Administrateur</option>
+                        </select> <br>
+                        <label for="">E-mail: </label><br>
+                        <input  type="email" name="email"><br>
+                        <label for="">Numéro de téléphone:</label><br>
+                        <input type="tel" name="phoneNumber"><br>
+                        <button type="submit">Créer</button>
+
+                    </form>
+                </div>
+            </div>
+
+            <!--Modal update a member-->
+            <div class="modal" id="update_modal">
+                <div class="modal-content">
+                    <button class="close" onclick="closeUpdateUser()">x</button>
+                    <br>
+                    <form th:action="@{/user/update}" method="post" th:object="${editUser}">
+                        <input type="hidden" name="idPerson" id="edit_id">
+                        <p>Modifier les infortion de l'utilisateur: <span id="edit_username"></span></p>
+                        <label for="user_name">Nom:</label><br>
+                        <input type="text" name="namePerson" id="edit_name"><br>
+                        <label for="user_fname">Prénom:</label><br>
+                        <input  type="text" name="firstNamePerson" id="edit_firstname"><br>
+                        <label for="role">Role:</label><br>
+                        <select name="role" id="edit_role">
+                            <option value="bibliothecaire">bibliothecaire</option>
+                            <option value="Administrateur">Administrateur</option>
+                        </select> <br>
+                        <label for="">E-mail: </label><br>
+                        <input type="email" name="email" id="edit_email"><br>
+                        <label for="">Numéro de téléphone:</label><br>
+                        <input type="tel" name="phoneNumber" id="edit_phone"><br>
+                        <button type="submit">modifier</button>
+
+                    </form>
+                </div>
+            </div>
+           
+
+            <div class="bod">
+
+            </div>
+
+
+            <input type="text" id="myInput" placeholder="Rechercher un utilisateur">
+
+            <table id="myTable">
+                <tr class="header">
+                    <th>Utilisateur</th>
+                    <th style="width:25%;">Nom & Prénom</th>
+                    <th>Téléphone</th>
+                    <th>Adresse Mail</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.username}">Koassi01</td>
+                    <td th:text="${user.namePerson + ' ' + user.firstNamePerson}">Koassi Chirst</td>
+                    <td th:text="${user.phoneNumber}">99 56 78 23</td>
+                    <td th:text="${user.email}">exemple@domain.com</td>
+                    <td th:text="${user.role}">Administrateur</td>
+                    <td>
+                        <!-- Reset Password Button with Confirm Dialog -->
+                        <form th:action="@{/user/reset/{id}(id=${user.idPerson})}" method="post" onsubmit="return confirm('Réinitialiser le mot de passe de [[${user.username}]] ?');" style="display: inline;">
+                          <button class="img_btn" type="submit"><img src="image/icon/reset.png" alt="Reset"></button>
+                        </form>
+                      
+                        <!-- Update Modal Button -->
+                        <button class="img_btn" th:onclick="'openUpdateUser(' + ${user.idPerson} + ')'"><img src="image/icon/edit.png" alt="Edit"></button>
+                      
+                        <!-- Delete Button with Confirm Dialog -->
+                        <form th:action="@{/user/delete/{id}(id=${user.idPerson})}" method="post" onsubmit="return confirm('Supprimer l\'utilisateur [[${user.username}]] ?');" style="display: inline;">
+                          <button class="img_btn" type="submit"><img src="image/icon/delete.png" alt="Delete"></button>
+                        </form>
+                      </td>
+                      
+                </tr>
+                <tr>
+                    <td>Kodjo02</td>
+                    <td>Kodjo Eunice</td>
+
+                    <td>76 56 96 57</td>
+                    <td>exemple@domain.com</td>
+                    <td>Utilisateur</td>
+                    <td>
+                        <button class="img_btn" onclick="openResetModal()"><img src="image/icon/reset.png"
+                                alt=""></button>
+                        <button class="img_btn" onclick="openUpdateModal()"><img src="image/icon/edit.png"
+                                alt=""></button>
+                        <button class="img_btn" onclick="openDeleteModal()"><img src="image/icon/delete.png"
+                                alt=""></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Marc01</td>
+                    <td>Marc Brice</td>
+
+                    <td>76 56 96 57</td>
+                    <td>exemple@domain.com</td>
+                    <td>Utilisateur</td>
+                    <td>
+                        <button class="img_btn" onclick="openResetModal()"><img src="image/icon/reset.png"
+                                alt=""></button>
+                        <button class="img_btn" onclick="openUpdateModal()"><img src="image/icon/edit.png"
+                                alt=""></button>
+                        <button class="img_btn" onclick="openDeleteModal()"><img src="image/icon/delete.png"
+                                alt=""></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ndaw53</td>
+                    <td>Ndaw Fatou</td>
+
+                    <td>76 56 96 57</td>
+                    <td>exemple@domain.com</td>
+                    <td>Utilisateur</td>
+                    <td>
+                        <button class="img_btn" onclick="openResetModal()"><img src="image/icon/reset.png"
+                                alt=""></button>
+                        <button class="img_btn" onclick="openUpdateModal()"><img src="image/icon/edit.png"
+                                alt=""></button>
+                        <button class="img_btn" onclick="openDeleteModal()"><img src="image/icon/delete.png"
+                                alt=""></button>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+    
+
+
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

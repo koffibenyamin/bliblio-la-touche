@@ -1,12 +1,16 @@
 package org.latouche.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -24,6 +28,9 @@ public class Member extends Person{
 	
 	@Enumerated(EnumType.STRING)
 	public Status status;
+	
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<Order> orders = new ArrayList<>();
 
 	public Member(String namePerson, String firstNamePerson, LocalDate dateOfBirth, Gender gender, String phoneNumber,
 			String email, String registerNumber, Status status) {

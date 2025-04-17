@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+            <!-- Form to search orders by register number -->
+            <form th:action="@{/order/return/search}" method="post">
+                <label>
+                    Matricule du Membre:
+                    <input type="text" name="registerNumber" required>
+                </label>
+                <button type="submit">Rechercher</button>
+            </form>
+
+            <!-- Show messages -->
+            <div th:if="${successMessage}" class="message success">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <div th:if="${errorMessage}" class="message error">
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- Show order details if found -->
+            <div th:if="${borrowedBooks}" class="book-list">
+                <h3>Livres Empruntés</h3>
+                <form th:action="@{/order/return/submit}" method="post">
+                    <input type="hidden" name="orderId" th:value="${order.id}" />
+
+                    <div th:each="book : ${borrowedBooks}">
+                        <label>
+                            <input type="checkbox" name="returnedSerials" th:value="${book.serialNumber}">
+                            <span th:text="${book.title} + ' (' + ${book.serialNumber} + ')'"></span>
+                        </label>
+                    </div>
+
+                    <p>
+                        Date d'emprunt: <strong th:text="${order.borrowDate}">--</strong><br>
+                        Date de retour prévue: <strong th:text="${order.returnDate}">--</strong>
+                    </p>
+
+                    <button type="submit">Enregistrer Retour</button>
+                </form>
+
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

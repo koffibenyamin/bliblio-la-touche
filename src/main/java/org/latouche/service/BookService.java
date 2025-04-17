@@ -1,6 +1,8 @@
 package org.latouche.service;
 
 import org.latouche.dto.BookDTO;
+import org.latouche.dto.BorrowInfoDTO;
+import org.latouche.dto.TopOrderedBookDTO;
 import org.latouche.model.Author;
 import org.latouche.model.Book;
 import org.latouche.model.Genre;
@@ -37,12 +39,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
 @Service 
 @RequiredArgsConstructor
 public class BookService {
 	 	private static final String GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes?q=isbn:";
-	    private static final String THUMBNAIL_DIR = "C:/Users/bbenj/Project/Internship/bibliotheque_la_touche/thumbnails/";
+	    private static final String THUMBNAIL_DIR = System.getProperty("user.dir") + "/src/main/resources/static/thumbnails/";
 	    //System.getProperty("user.dir") + "/thumbnails/";
 
 	    private final BookRepository bookRepository;
@@ -84,11 +87,13 @@ public class BookService {
 	            return genreRepository.save(newGenre);
 	        });
 
-	        String thumbnailPath = (thumbnailUrl != null) ? saveThumbnailFromUrl(thumbnailUrl, title) : null;
-	        String serialNumber = generateUniqueSerialNumber();
-
 	        Book book = new Book();
+	        String serialNumber = generateUniqueSerialNumber();
 	        book.setSerialNumber(serialNumber);
+	        String thumbnailPath = (thumbnailUrl != null) ? saveThumbnailFromUrl(thumbnailUrl, serialNumber) : null;
+	        
+
+	        
 	        book.setTitle(title);
 	        book.setDescription(description);
 	        book.setThumbnailPath(thumbnailPath);
@@ -192,13 +197,13 @@ public class BookService {
 	        return volumeInfo.has("description") ? volumeInfo.getString("description") : "Description non disponible en français.";
 	    }
 
-	    private String saveThumbnailFromUrl(String imageUrl, String title) {
+	    private String saveThumbnailFromUrl(String imageUrl, String serialNumber) {
 	        try (InputStream in = new URL(imageUrl).openStream()) {
 	            File directory = new File(THUMBNAIL_DIR);
 	            if (!directory.exists()) {
 	                directory.mkdirs();
 	            }
-	            String filePath = THUMBNAIL_DIR + title.replaceAll("\\s+", "_") + ".jpg";
+	            String filePath = THUMBNAIL_DIR +  serialNumber + ".jpg";
 	            try (FileOutputStream out = new FileOutputStream(filePath)) {
 	                byte[] buffer = new byte[1024];
 	                int bytesRead;
@@ -206,11 +211,13 @@ public class BookService {
 	                    out.write(buffer, 0, bytesRead);
 	                }
 	            }
-	            return filePath;
+	            return "/thumbnails/" +  serialNumber + ".jpg";
 	        } catch (Exception e) {
 	            return null;
 	        }
-	    }	    
+	    }
+	    
+	    
 	    private String saveThumbnail(MultipartFile file, String serialNumber) {
 	        try {
 	            File directory = new File(THUMBNAIL_DIR);
@@ -219,7 +226,7 @@ public class BookService {
 	            }
 	            String filePath = THUMBNAIL_DIR + serialNumber + ".jpg";
 	            file.transferTo(new File(filePath));
-	            return filePath;
+	            return "/thumbnails/" + serialNumber + ".jpg";
 	        } catch (IOException e) {
 	            throw new RuntimeException("Failed to save thumbnail", e);
 	        }
@@ -256,4 +263,76 @@ public class BookService {
         int borrowedCopies = orderRepository.countBorrowedCopies(bookId);
         return (book.getNumberOfCopies() - borrowedCopies) > 0;
     }
+    
+    public List<BookDTO> getBooksWithAvailability() {
+        List<Object[]> rawBooks = bookRepository.findBooksWithDetails();
+        
+        return rawBooks.stream().map(obj -> {
+            Long id = ((Number) obj[0]).longValue();
+            String serialNumber = (String) obj[1];
+            String title = (String) obj[2];
+            int numberOfCopies = ((Number) obj[3]).intValue();
+            String description = (String) obj[4];
+            String thumbnailPath = (String) obj[5];
+            String genreName = (String) obj[6];
+            String authorName = (String) obj[7];
+
+            int borrowed = orderRepository.countBorrowedCopies(id);
+            int available = numberOfCopies - borrowed;
+
+            return new BookDTO(
+                id,
+                serialNumber,
+                title,
+                numberOfCopies,
+                description,
+                thumbnailPath,
+                genreName,
+                authorName,
+                available
+            );
+        }).toList();
+    }
+    
+    public List<BorrowInfoDTO> getBorrowInfoByBookId(Long bookId) {
+        List<Object[]> rows = orderRepository.findBorrowInfoByBookId(bookId);
+
+        return rows.stream().map(row -> new BorrowInfoDTO(
+            (Long) row[0],  // idPerson
+            row[1] + " " + row[2], // full name: name + first name
+            (String) row[3],  // register number
+            (String) row[4],  // phone
+            (String) row[5],  // email
+            (LocalDate) row[6], // borrow date
+            (LocalDate) row[7], // return date
+            (Boolean) row[8]    // returned
+        )).toList();
+    }
+    
+    public BookDTO getBookDTOById(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        return new BookDTO(
+            book.getId(),
+            book.getSerialNumber(),
+            book.getTitle(),
+            book.getNumberOfCopies(),
+            book.getDescription(),
+            book.getThumbnailPath(),
+            book.getGenre() != null ? book.getGenre().getName() : "",
+            book.getAuthor() != null ? book.getAuthor().getName() : "",
+            book.getAvailableCopies()
+        );
+    }
+    
+    public List<TopOrderedBookDTO> getTop7OrderedBooks() {
+        return bookRepository.findTop7OrderedBooks()
+                             .stream()
+                             .limit(7)
+                             .toList(); // limit to 7 manually
+    }
+
+
+    
 }

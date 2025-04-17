@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+
+            <form th:action="@{/order/borrow}" method="post">
+                <label>Matricule:</label>
+                <input type="text" name="registerNumber" required><br>
+
+                <!-- Book input blocks -->
+                <div class="column">
+                    <label>Matricule du Livre 1:</label>
+                    <input type="text" name="serialNumbers" placeholder="Ex: 12345"
+                        onblur="fetchBookPreview(this, 'preview1')">
+                    <div id="preview1" class="preview-box"></div>
+                </div>
+
+                <div class="column">
+                    <label>Matricule du Livre 2:</label>
+                    <input type="text" name="serialNumbers" placeholder="Ex: 23456"
+                        onblur="fetchBookPreview(this, 'preview2')">
+                    <div id="preview2" class="preview-box"></div>
+                </div>
+
+                <div class="column">
+                    <label>Matricule du Livre 3:</label>
+                    <input type="text" name="serialNumbers" placeholder="Ex: 34567"
+                        onblur="fetchBookPreview(this, 'preview3')">
+                    <div id="preview3" class="preview-box"></div>
+                </div>
+
+                <label>Durée:</label>
+                <input type="number" name="period" value="14" min="1"> jour(s)
+
+                <button type="submit">Enregistrer Emprunt</button>
+
+                <!-- Success and error messages -->
+                <!-- Success message -->
+                <div id="successMsg" th:if="${successMessage}"
+                    style="color: green; font-weight: bold; margin-bottom: 10px;">
+                    <p th:text="${successMessage}"></p>
+                </div>
+
+                <div id="errorMsg" th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 10px;">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+
+            </form>
+
+            <hr>
+
+            <fieldset>
+                <legend>Historique</legend>
+
+                <input type="text" name="recherche" id="myInput" placeholder="Rechercher un Membre...">
+                <table id="myTable">
+                    <tr class="header">
+                        <th>Matricule</th>
+                        <th>Nom & Prénom</th>
+                        <th>Nombre</th>
+                        <th>Livre(s)</th>
+                        <th>Date Emprunt</th>
+                        <th>Date Retour</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.member.registerNumber}">4532</td>
+                        <td><a th:href="@{'/member/' + ${order.member.idPerson} + '/details'}"
+                                th:text="${order.member.namePerson + ' ' + order.member.firstNamePerson}">Assiri
+                                emmanuel</a></td>
+                        <td th:text="${order.books.size()}">03</td>
+                        <td class="book_list">
+                            <ul>
+                                <li th:each="book : ${order.books}"><a href="book_detail.html"
+                                        th:text="${book.title}">livre_1</a></li>
+                            </ul>
+                        </td>
+                        <td th:text="${order.borrowDate}">--/--/----</td>
+                        <td th:text="${order.returnDate}">--/--/----</td>
+                        <td th:text="${order.returned ? 'Retourné' : 'Non Retourné'}">
+                        </td>
+                    </tr>
+                                     
+                    
+                </table>
+
+
+            </fieldset>
+
+
+
+
+
+
+
+
+        </div>
+
+
+
+        <script src="/script.js"></script>
+</body>
+
+</html>

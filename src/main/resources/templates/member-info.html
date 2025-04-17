@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+
+            <div style="width: 50%;">
+                <p>Matricule: <span th:text="${member.registerNumber}">4123</span></p>
+                <p>Nom: <span th:text="${member.namePerson}">Tessilimi</span></p>
+                <p>Prénom: <span th:text="${member.firstNamePerson}"> Arida</span></p>
+                <p>Sexe: <span th:text="${member.gender}">Femme</span></p>
+                <p>Contact: <span th:text="${member.phoneNumber}">99 41 06 78</span></p>
+                <p>Date de naissance:<span
+                        th:text="${#temporals.format(member.dateOfBirth, 'dd-MM-yyyy')}">12/12/2009</span></p>
+
+
+            </div>
+
+
+            <div>
+                <button onclick="openUpdateModal()">Modifier</button>
+                <button type="button">Imprimer Carte De Membre</button>
+
+            </div>
+
+
+            <div>
+                <h4>Historique Des Emprunts</h4>
+                <table id="myTable">
+                    <tr class="header">
+                        <th>Date d'Emprunt</th>
+                        <th>Date de Retour</th>
+                        <th>Livres</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${#temporals.format(order.borrowDate, 'dd-MM-yyyy')}"></td>
+                        <td th:text="${#temporals.format(order.returnDate, 'dd-MM-yyyy')}"></td>
+                        
+                        <td>
+                            <ul>
+                                <li th:each="book : ${order.books}" th:text="${book.title}"></li>
+                            </ul>
+                        </td>
+                        <td th:text="${order.returned ? 'Rendu' : 'Non Rendu'}"></td>
+                    </tr>
+                                     
+                    
+                </table>
+
+            </div>
+
+
+        </div>
+
+
+
+</div>
+        <script src="/script.js"></script>
+</body>
+
+</html>

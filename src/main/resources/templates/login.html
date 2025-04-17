@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/style2.css">
+    <title>La Touche Biblio</title>
+</head>
+<body class="login_body">
+    <div class="main">
+        <img src="/image/logo.png" alt="">
+        <h1>La Touche</h1>
+        <p>Bienvenue sur le gestionnaire de bibliothèque La Touche</p> <br>
+
+        <form method="POST" th:action="@{/login}">
+            <label>Nom d'Utilisateur:</label>
+            <input type="text" name="username">
+            
+            <label>Mot de passe:</label>
+            <input type="password" name="password">
+        
+            <button type="submit">Se connecter</button>
+        </form>
+
+
+    </div>
+
+
+
+</body>
+</html>

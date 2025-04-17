@@ -1,16 +1,25 @@
 package org.latouche.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.imageio.ImageIO;
+
 import org.latouche.dto.BookDTO;
+import org.latouche.dto.BorrowInfoDTO;
+import org.latouche.dto.TopOrderedBookDTO;
 import org.latouche.model.Author;
 import org.latouche.model.Book;
+import org.latouche.parameters.QRCodeGenerator;
 import org.latouche.repository.AuthorRepository;
 import org.latouche.repository.BookRepository;
 import org.latouche.repository.GenreRepository;
 import org.latouche.service.BookService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,9 +43,11 @@ import org.thymeleaf.engine.AttributeName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.WriterException;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -48,68 +59,44 @@ import org.springframework.http.MediaType;
 public class BookController {
 	
 	  private final BookService bookService;
+	  private final BookRepository bookRepository;
 	  private final GenreRepository genreRepository;
 	  private final AuthorRepository authorRepository;
+	  @Autowired
+	  private QRCodeGenerator qrCodeGenerator;
 	  
-	  @GetMapping("/{bookId}/availability")
-	  public ResponseEntity<Boolean> checkBookAvailability(@PathVariable Long bookId) {
-	        boolean available = bookService.isBookAvailable(bookId);
-	        return ResponseEntity.ok(available);
-	    }
 	  
 	  
 
-	  @GetMapping("/isbn/{isbn}")
-	  public ResponseEntity<Book> fetchBookByISBN(
-	            @PathVariable String isbn, 
-	            @RequestParam(defaultValue = "1") int numberOfCopies) {
-	        Book book = bookService.fetchAndSaveBookByISBN(isbn, numberOfCopies);
-	        return ResponseEntity.ok(book);
-	    }
-	  
-	  @PostMapping
-	  public ResponseEntity<Book> createBooks(
-	          @ModelAttribute Book book,
-	          @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile) {
-	      
-	      Book savedBook = bookService.createBook(book, thumbnailFile);
-	      return ResponseEntity.ok(savedBook);
-	  }
-
-	  
-	  @PutMapping("/{id}")
-	    public ResponseEntity<Book> updateBooks(
-	            @PathVariable Long id,
-	            @ModelAttribute Book updatedBook,
-	            @RequestParam(value = "thumbnail", required = false) MultipartFile newThumbnail) {
-	        Book book = bookService.updateBook(id, updatedBook, newThumbnail);
-	        return ResponseEntity.ok(book);
-	    }
-	  
-	
-
-	    @DeleteMapping("/{id}")
-	    public ResponseEntity<String> deleteBooks(@PathVariable Long id) {
-	        bookService.deleteBook(id);
-	        return ResponseEntity.ok("Book deleted successfully");
-	    }
-
-	   /// @GetMapping
-	    //public List<Map<String, Object>> getAllBooks() {
-	   //     return bookService.getAllBooks();
-	    ///}
+	   
 	    
 	    @GetMapping("")
-	    public String getall(Model model) {
-	    	List<Map<String, Object>> books= bookService.getAllBooks();
-	    	
-	    	
-	    	
-	    	model.addAttribute("bk", books);	    	
-	    	model.addAttribute("authors", authorRepository.findAll());
+	    public String listBooks(Model model) {
+	        List<BookDTO> books = bookService.getBooksWithAvailability();
+	        List<TopOrderedBookDTO> topOrderedBooks = bookService.getTop7OrderedBooks();
+	        model.addAttribute("bk", books);
+	        model.addAttribute("topBooks", topOrderedBooks);
+	        model.addAttribute("authors", authorRepository.findAll());
 	        model.addAttribute("genres", genreRepository.findAll());
-	    	return "book"; 
+	        return "book";
 	    }
+	    
+	    @GetMapping("/details/{bookId}")
+	    public String getBookDetailsWithBorrowInfo(@PathVariable Long bookId, Model model) {
+	        // Get BookDTO
+	        BookDTO bookDTO = bookService.getBookDTOById(bookId);
+	        
+	        // Get list of members who borrowed this book
+	        List<BorrowInfoDTO> borrowList = bookService.getBorrowInfoByBookId(bookId);
+
+	        model.addAttribute("book", bookDTO);
+	        model.addAttribute("borrowList", borrowList);
+
+	        return "book-info"; // name of your Thymeleaf page (book-details.html)
+	    }
+	    
+	    
+	    
 	    
 	    @GetMapping("/isbn")
 	    public String fetchBookByISBN(
@@ -125,7 +112,24 @@ public class BookController {
 	        }
 
 	        return "redirect:/book";
-	    }	    
+	    }
+	    
+	    @GetMapping("/get/{id}")
+	    @ResponseBody
+	    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+	    	return bookRepository.findById(id).map(book -> {
+	            BookDTO dto = new BookDTO();
+	            dto.setId(book.getId());
+	            dto.setSerialNumber(book.getSerialNumber());
+	            dto.setTitle(book.getTitle());
+	            dto.setDescription(book.getDescription());
+	            dto.setThumbnailPath(book.getThumbnailPath());
+	            dto.setNumberOfCopies(book.getNumberOfCopies());
+	            dto.setAuthorName(book.getAuthor() != null ? book.getAuthor().getName() : "");
+	            dto.setGenreName(book.getGenre() != null ? book.getGenre().getName() : "");
+	            return ResponseEntity.ok(dto);
+	        }).orElse(ResponseEntity.notFound().build());
+	    }
 	    
 	    
 	    @PostMapping("/add")
@@ -151,6 +155,32 @@ public class BookController {
 	        bookService.deleteBook(id);
 	        return "redirect:/book";
 	    }
+	    
+	    @GetMapping("/qr/{serialNumber}")
+	    public ResponseEntity<byte[]> generateQRCode(@PathVariable String serialNumber) throws IOException, WriterException {
+	        BufferedImage qrImage = qrCodeGenerator.generateQRCodeImage(serialNumber, 100, 100);
+
+	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        ImageIO.write(qrImage, "PNG", baos);
+
+	        byte[] imageBytes = baos.toByteArray();
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.IMAGE_PNG);
+
+	        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+	    }
+	    
+	    @GetMapping("/preview/{serialNumber}")
+	    @ResponseBody
+	    public ResponseEntity<BookDTO> getBookPreview(@PathVariable String serialNumber) {
+	        Book book = bookRepository.findBySerialNumber(serialNumber)
+	            .orElseThrow(() -> new RuntimeException("Book not found"));
+
+	        BookDTO dto = new BookDTO(book.getSerialNumber(), book.getTitle(), book.getThumbnailPath());
+	        return ResponseEntity.ok(dto);
+	    }
+	    
+	    
 	    
 	   
 

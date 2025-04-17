@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+            <h3>Mot De Passe</h3>
+            <p>Vous serez déconnecté après avoir changé</p>
+
+            <form style="display: flex; flex-direction: column;" th:action="@{/user/change-password}" method="post">
+                <div>
+                    <label style=" float: left;">
+                        Mot De Passe Actuel: <input type="password" name="oldPassword" required>
+                    </label>
+                </div>
+
+
+                <div>
+                    <fieldset>
+                        <legend>Changer Mot De Passe</legend>
+                        <label>
+                            Nouveau Mot De Passe: <input type="password" name="newPassword" required>
+                        </label>
+                        <label>
+                            Confirmé Mot De Passe: <input type="password" name="confirmPassword" required>
+                        </label>
+                    </fieldset>
+
+
+
+                </div>
+
+
+                <button type="submit">Changer</button>
+            </form>
+
+        </div>
+    </div>
+</body>
+
+</html>

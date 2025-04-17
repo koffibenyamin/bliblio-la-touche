@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+
+
+
+            <div class="modal-content" id="confi">
+
+                <div style="width:50%;">
+                    <p>Code Livre: <span th:text="${book.serialNumber}">4123</span></p>
+                    <p>Titre: <span th:text="${book.title}">The Housemaid</span></p>
+                    <p>Auteur: <span th:text="${book.authorName}"> Freida McFadden</span></p>
+                    <p>Genre: <span th:text="${book.genreName}">Roman à Suspense</span></p>
+                    <p>Nombre de copies: <span th:text="${book.numberOfCopies}">10</span></p>
+                    <p>Nombre de copies Disponible: <span th:text="${book.availableCopies}">10</span></p>
+
+                </div>
+                <div style="float:right;">
+                    <img th:src="@{${book.thumbnailPath}}" alt="" style="width: 100px ; height: 150px;">
+                    <img th:src="@{'/book/qr/' + ${book.serialNumber}}" alt="QR Code"
+                        style="width: 100px ; height: 100px; ">
+                </div>
+                <div>
+                    <h4>Résumé</h4>
+                    <textarea disabled style="width: 850px; height: 100px;"
+                        th:field="${book.description}">   </textarea>
+                </div>
+                <button type="button" class="print-qrs-btn"
+                    th:attr="data-serial=${book.serialNumber}, data-title=${book.title}, data-copies=${book.numberOfCopies}">
+                    Print QR Codes
+                </button>
+
+
+
+            </div>
+
+
+
+            <!--Modal update a book-->
+            <div class="modal" id="update_modal">
+                <div class="modal-content" id="confi" style="display: inline-block;">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <form action="#" method="post">
+                        <h6>Modifier les infortion du Livre: XXXXX</h6>
+                        <div>
+                            <h1>Couverture</h1>
+                            <p><input type='file' accept='image/*' onchange="readURL(this)"></p>
+                            <img src="image/9780062315007_p0_v2_s192x300.jpg" alt="No Image" id="img"
+                                style='height:150px;'>
+                        </div>
+                        <div>
+                            <label for="title">Titre</label><br>
+                            <input type="text" name="title" id=""><br>
+                            <label for="author">Auteur</label><br>
+                            <input type="text" name="author" id=""><br>
+                            <label for="genre">Genre</label><br>
+                            <select name="genre">
+                                <option value="roman_policier">Roman Policier</option>
+                                <option value="roman_suspence">Roman à Suspense</option>
+                                <option value="livre_educatif">Livre Educatif</option>
+                            </select> <br>
+                            <label for="publish">Publication</label><br>
+                            <input type="text" name="publish" id=""><br>
+                            <label for="quantity">Nombre de copies</label><br>
+                            <input type="number" name="quantity" id=""><br>
+
+                        </div>
+                        <div>
+                            <label for="description">Résumé</label><br>
+                            <textarea name="description" id=""></textarea><br>
+
+
+                        </div>
+                        <button type="submit">modifier</button>
+
+                    </form>
+                </div>
+            </div>
+
+            <div>
+                <h4>Historique Des Emprunts</h4>
+                <table id="myTable">
+                    <tr class="header">
+
+                        <th style="width:40%;">Membre</th>
+                        <th>Date d'Émission</th>
+                        <th>Date de Retour</th>
+                        <th>Etat</th>
+                    </tr>
+                    <tr th:each="info : ${borrowList}">
+                        <td th:text="${info.fullName}"></td>
+                        <td th:text="${info.borrowDate}"></td>
+                        <td th:text="${info.returnDate}"></td>
+                        <td th:text="${info.returned} ? 'Retourné' : 'Non Retourné'"></td>
+                    </tr>
+                </table>
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

@@ -412,3 +412,7 @@ textarea{
 .book_list ul{
   left: 0;
 }
+
+input[type='text'] {
+  text-transform: capitalize
+}

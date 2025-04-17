@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/head :: head}"></th:block>
+
+<body>
+
+    <th:block th:replace="~{fragments/head :: side}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{fragments/head :: header}"></th:block>
+
+        <div class="work">
+
+            <button onclick="openModal()">Ajouter Un Membre</button>
+            <fieldset style="height: 10%; width: 40%;">
+                <legend>Emprunt/Retour</legend>
+                <a href="/order/borrow"><button>Emprunt</button></a>
+                <a href="/order/return"><button>Retour</button></a>
+            </fieldset>
+            <!--Modal add a member-->
+            <div class="modal" id="add_modal">
+                <div class="modal-content">
+                    <button class="close" onclick="closeModal()">x</button>
+                    <br>
+                    <form th:action="@{/member/create}" th:object="${member}" method="post">
+                        <div>
+                            <label for="name">Nom</label><br>
+                            <input type="text" th:field="*{namePerson}" required><br>
+
+                            <label for="first_name">Prénom</label><br>
+                            <input type="text" th:field="*{firstNamePerson}" required><br>
+
+                            <label for="genre">Sexe</label><br>
+                            <select th:field="*{gender}" required>
+                                <option value="HOMME">Homme</option>
+                                <option value="FEMME">Femme</option>
+                            </select><br>
+
+                            <label for="number">Numéro de Téléphone</label><br>
+                            <input type="tel" th:field="*{phoneNumber}" required><br>
+
+                            <label for="date">Date de Naissance</label><br>
+                            <input type="date" th:field="*{dateOfBirth}" required><br>
+
+                            <label for="status">Status</label><br>
+                            <select th:field="*{status}" required>
+                                <option value="ACTIVE">Actif</option>
+                                <option value="BLOCKED">Bloqué</option>
+                            </select><br><br>
+
+                            <button type="submit">Ajouter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <!--Modal update a member-->
+            <div class="modal" id="update_modal">
+    <div class="modal-content">
+                    <button class="close" onclick="closeUpdateMember()">x</button>
+                    <br>
+                    <form th:action="@{/member/update}" th:object="${memberToUpdate}" method="post">
+                        <!-- Hidden input for ID -->
+                        <input type="hidden" name="idPerson" id="updateId">
+
+                        <p>Modifier les informations du Membre: <span id="updateMatricule"></span></p>
+
+                        <div>
+                            <label>Nom</label><br>
+                            <input type="text" name="namePerson" id="updateName"><br>
+
+                            <label>Prénom</label><br>
+                            <input type="text" name="firstNamePerson" id="updateFirstName"><br>
+
+                            <label>Sexe</label><br>
+                            <select name="gender" id="updateGender">
+                                <option value="HOMME">Homme</option>
+                                <option value="FEMME">Femme</option>
+                            </select> <br>
+
+                            <label>Numéro de Téléphone</label><br>
+                            <input type="tel" name="phoneNumber" id="updatePhone"><br>
+                            
+                            <label for="date">Date de Naissance</label><br>
+                            <input type="date" name="dateOfBirth" id="updateDateOfBirth"><br>
+
+                            
+                        </div>
+
+                        <button type="submit">Modifier</button>
+                    </form>
+                </div>
+            </div>
+
+            <!--modal card -->
+            <div id="print_card_modal" class="modal">
+    <div class="modal-content" id="member_card_content">
+        <button class="close" onclick="closePrintModal()">x</button>
+        <h2>Carte de Membre</h2>
+        <p><strong>Nom:</strong> <span id="cardFullName"></span></p>
+        <p><strong>Téléphone:</strong> <span id="cardPhone"></span></p>
+        <p><strong>Date de Naissance:</strong> <span id="cardDOB"></span></p>
+        <p><strong>Matricule:</strong> <span id="cardRegisterNumber"></span></p>
+        <img id="qrCodeImage" src="" alt="QR Code" />
+        <br>
+        <button onclick="printMemberCard()">Imprimer</button>
+    </div>
+</div>
+
+
+
+            
+
+            <div class="bod">
+
+            </div>
+
+
+            <input type="text" id="myInput" placeholder="Rechercher un utilisateur">
+
+            <table id="myTable">
+                <tr class="header">
+                    <th>Matricule</th>
+                    <th style="width:20%;">Nom & Prénom</th>
+                    <th>Numéro de Téléphone</th>
+                    <th>Sexe</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                <tr th:each="member : ${members}">
+                    <td th:text="${member.registerNumber}">4532</td>
+                    <td><a href="member_detail.html"
+                            th:text="${member.namePerson + ' ' + member.firstNamePerson}">Assiri emmanuel</a></td>
+                    <td th:text="${member.phoneNumber}">99 56 78 23</td>
+                    <td th:text="${member.gender}">Homme</td>
+                    <td>
+                        <span th:if="${member.status.name() == 'ACTIVE'}" class="available">Actif</span>
+                        <span th:if="${member.status.name() != 'ACTIVE'}" class="overdue"
+                            th:text="${member.status}"></span>
+                    </td>
+                    <td>
+                        <button class="img_btn" th:onclick="'window.open(\'/member/card/' + ${member.idPerson} + '\')'">
+    <img src="image/icon/id_card.png" alt="">
+</button>
+
+
+
+
+                                
+                                
+                                
+                        <button class="img_btn" th:attr="onclick=|openUpdateModal(
+            '${member.idPerson}',
+            '${member.registerNumber}',
+            '${member.namePerson}',
+            '${member.firstNamePerson}',
+            '${member.gender}',
+            '${member.phoneNumber}',
+            '${#temporals.format(member.dateOfBirth, 'yyyy-MM-dd')}'
+        )|">
+                            <img src="image/icon/edit.png" alt="">
+                        </button>
+                        
+                        <form th:action="@{'/member/' + ${member.idPerson} + '/status'}" method="post" style="display:inline;">
+    <button type="submit" class="img_btn">
+        <img th:src="${member.status.name() == 'ACTIVE'} ? 'image/icon/block_member.png' : '/image/icon/unblocked_member.png'"
+             th:alt="${member.status.name() == 'ACTIVE'} ? 'Bloquer' : 'Activer'"
+             th:title="${member.status.name() == 'ACTIVE'} ? 'Bloquer ce membre' : 'Activer ce membre'">
+    </button>
+</form>
+                        
+
+                    </td>
+                </tr>
+
+
+
+            </table>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <script src="/script.js"></script>
+</body>
+
+</html>
